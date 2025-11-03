@@ -1,0 +1,62 @@
+// ===========================================================
+// JWT Authentication Simulation (No Express Required)
+// ===========================================================
+
+let users = [{ username: "gurtej", password: "12345", token: null }];
+let account = { owner: "Gurtej Singh", balance: 5000 };
+
+// Simulate token generation
+function generateToken(username) {
+  return "token-" + username + "-" + Math.random().toString(36).substring(2);
+}
+
+// Login simulation
+function login(username, password) {
+  const user = users.find(u => u.username === username && u.password === password);
+  if (!user) return "❌ Invalid credentials";
+  user.token = generateToken(username);
+  return `✅ Login successful! Token: ${user.token}`;
+}
+
+// Verify token
+function verifyToken(token) {
+  const user = users.find(u => u.token === token);
+  if (!user) throw new Error("⛔ Invalid or missing token");
+  return user;
+}
+
+// Protected operations
+function getBalance(token) {
+  verifyToken(token);
+  return `💳 Current Balance: ₹${account.balance}`;
+}
+
+function deposit(token, amount) {
+  verifyToken(token);
+  if (amount <= 0) throw new Error("❌ Invalid amount");
+  account.balance += amount;
+  return `💰 Deposited ₹${amount}. New Balance: ₹${account.balance}`;
+}
+
+function withdraw(token, amount) {
+  verifyToken(token);
+  if (amount <= 0) throw new Error("❌ Invalid amount");
+  if (amount > account.balance) throw new Error("🚫 Insufficient balance");
+  account.balance -= amount;
+  return `💸 Withdrawn ₹${amount}. New Balance: ₹${account.balance}`;
+}
+
+// ------------------------------------------------------------
+// SIMULATION
+// ------------------------------------------------------------
+console.log("=====================================");
+console.log(" BANKING API JWT AUTH (SIMULATION) ");
+console.log("=====================================");
+
+const loginMessage = login("gurtej", "12345");
+console.log(loginMessage);
+
+const token = loginMessage.split("Token: ")[1];
+console.log(getBalance(token));
+console.log(deposit(token, 1500));
+console.log(withdraw(token, 1000));
